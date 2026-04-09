@@ -50,3 +50,17 @@ print(f"Accuracy: {accuracy * 100:.2f}%")
 # STEP 12: Print unique values of the label column
 original_labels = labels["cancer"].unique()
 print(f"Unique values in the label column: {original_labels}")
+
+
+from sklearn.svm import SVC
+
+# STEP 12: Train SVM model
+svm_model = SVC()
+svm_model.fit(X_train, y_train)
+
+# STEP 13: Predict using SVM
+y_pred_svm = svm_model.predict(X_test)
+
+# STEP 14: Evaluate SVM
+accuracy_svm = accuracy_score(y_test, y_pred_svm)
+print(f"SVM Accuracy: {accuracy_svm * 100:.2f}%")
