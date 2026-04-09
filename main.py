@@ -64,3 +64,18 @@ y_pred_svm = svm_model.predict(X_test)
 # STEP 14: Evaluate SVM
 accuracy_svm = accuracy_score(y_test, y_pred_svm)
 print(f"SVM Accuracy: {accuracy_svm * 100:.2f}%")
+
+
+
+from sklearn.neighbors import KNeighborsClassifier
+
+# STEP: Train KNN model
+knn_model = KNeighborsClassifier(n_neighbors=5)
+knn_model.fit(X_train, y_train)
+
+# Predict
+y_pred_knn = knn_model.predict(X_test)
+
+# Evaluate
+accuracy_knn = accuracy_score(y_test, y_pred_knn)
+print(f"KNN Accuracy: {accuracy_knn * 100:.2f}%")
