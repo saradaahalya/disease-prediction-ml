@@ -1,7 +1,10 @@
+from sklearn.decomposition import PCA
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
+from sklearn.svm import SVC
+from sklearn.neighbors import KNeighborsClassifier
 
 # STEP 1: Load training dataset only
 data = pd.read_csv("data/data_set_ALL_AML_train.csv")
@@ -31,51 +34,43 @@ y = labels["cancer"].map({'ALL': 0, 'AML': 1})
 # Ensure data and labels have the same number of samples
 data = data.iloc[:len(y)]
 
-# STEP 8: Train-test split (THIS FIXES EVERYTHING)
+# STEP 8: Train-test split
 X_train, X_test, y_train, y_test = train_test_split(
     data, y, test_size=0.2, random_state=42
 )
 
-# STEP 9: Train model
-model = RandomForestClassifier()
-model.fit(X_train, y_train)
+# 🔥 STEP 9: APPLY PCA (KEY STEP)
+pca = PCA(n_components=10)
 
-# STEP 10: Predict
-y_pred = model.predict(X_test)
+X_train = pca.fit_transform(X_train)
+X_test = pca.transform(X_test)
 
-# STEP 11: Evaluate
-accuracy = accuracy_score(y_test, y_pred)
-print(f"Accuracy: {accuracy * 100:.2f}%")
+print("Explained variance:", pca.explained_variance_ratio_.sum())
 
-# STEP 12: Print unique values of the label column
-original_labels = labels["cancer"].unique()
-print(f"Unique values in the label column: {original_labels}")
+# ================= RANDOM FOREST =================
+rf_model = RandomForestClassifier(random_state=42)
+rf_model.fit(X_train, y_train)
 
+y_pred_rf = rf_model.predict(X_test)
+accuracy_rf = accuracy_score(y_test, y_pred_rf)
+print(f"Random Forest Accuracy (PCA): {accuracy_rf * 100:.2f}%")
 
-from sklearn.svm import SVC
-
-# STEP 12: Train SVM model
+# ================= SVM =================
 svm_model = SVC()
 svm_model.fit(X_train, y_train)
 
-# STEP 13: Predict using SVM
 y_pred_svm = svm_model.predict(X_test)
-
-# STEP 14: Evaluate SVM
 accuracy_svm = accuracy_score(y_test, y_pred_svm)
-print(f"SVM Accuracy: {accuracy_svm * 100:.2f}%")
+print(f"SVM Accuracy (PCA): {accuracy_svm * 100:.2f}%")
 
-
-
-from sklearn.neighbors import KNeighborsClassifier
-
-# STEP: Train KNN model
+# ================= KNN =================
 knn_model = KNeighborsClassifier(n_neighbors=5)
 knn_model.fit(X_train, y_train)
 
-# Predict
 y_pred_knn = knn_model.predict(X_test)
-
-# Evaluate
 accuracy_knn = accuracy_score(y_test, y_pred_knn)
-print(f"KNN Accuracy: {accuracy_knn * 100:.2f}%")
+print(f"KNN Accuracy (PCA): {accuracy_knn * 100:.2f}%")
+
+# STEP: Print labels
+original_labels = labels["cancer"].unique()
+print(f"Unique values in the label column: {original_labels}")
